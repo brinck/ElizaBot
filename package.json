@@ -18,8 +18,9 @@
     "NLP"
   ],
   "dependencies": {
-    "express": "*",
-    "dotenv": "^2.0.0"
+    "dotenv": "^2.0.0",
+    "elizabot": "0.0.2",
+    "express": "*"
   },
   "author": "Frederik Jensen, Kenny Song",
   "license": "ISC",
