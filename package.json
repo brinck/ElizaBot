@@ -1,0 +1,30 @@
+{
+  "name": "fb-elizabot",
+  "version": "0.0.1",
+  "description": "The ElizaBot hooked into facebooks new messenger API.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/brinck/ElizaBot.git"
+  },
+  "keywords": [
+    "Eliza",
+    "bot",
+    "messenger",
+    "NLP"
+  ],
+  "dependencies": {
+    "express": "*",
+    "dotenv": "^2.0.0"
+  },
+  "author": "Frederik Jensen, Kenny Song",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/brinck/ElizaBot/issues"
+  },
+  "homepage": "https://github.com/brinck/ElizaBot#readme"
+}
