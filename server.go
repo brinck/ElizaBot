@@ -6,8 +6,8 @@ import (
     "fmt"
     "github.com/kennysong/goeliza"
     "google.golang.org/appengine"
+    "google.golang.org/appengine/log"
     "google.golang.org/appengine/urlfetch"
-    "log"
     "net/http"
 )
 
@@ -87,6 +87,9 @@ type Reply struct {
  * with the elizabot at "/webhook" using POST messages
  */
 func webhookHandler(wr http.ResponseWriter, req *http.Request) {
+    // Create a GAE Context for this request
+    ctx := appengine.NewContext(req)
+
 	// Verify Facebook validation token
 	token := req.URL.Query().Get("hub.verify_token")
 	if (token == "quanfucius") {
@@ -97,7 +100,7 @@ func webhookHandler(wr http.ResponseWriter, req *http.Request) {
 	var webhookData Webhook
 	decoder := json.NewDecoder(req.Body)
 	if err := decoder.Decode(&webhookData); err != nil {
-        log.Println("JSON decoding error:", err, req.Body)
+        log.Errorf(ctx, "JSON decoding error:\nerr: %v\nreq.Body: %v", err, req.Body)
     }
 
 	// Loop through messages
@@ -108,7 +111,7 @@ func webhookHandler(wr http.ResponseWriter, req *http.Request) {
             input := event.Message.Text
             output := goeliza.ReplyTo(input)
 
-            log.Println("Input:", input, "Output:", output)
+            log.Debugf(ctx, "Input: %s\nOutput: %s", input, output)
 
             // Construct Recipient and Message structs
             recipient := Recipient{event.Sender.Id}
@@ -137,7 +140,7 @@ func webhookReply(recipient Recipient, message Message, req *http.Request) {
 	reply := Reply{recipient, message}
 	payload, errMarshal := json.Marshal(reply)
 	if errMarshal != nil {
-		log.Println("Serializing JSON error:", errMarshal)
+		log.Errorf(ctx, "Serializing JSON error: %s", errMarshal)
 		return
 	}
 
@@ -146,14 +149,14 @@ func webhookReply(recipient Recipient, message Message, req *http.Request) {
 	req, errPost := http.NewRequest("POST", url, bytes.NewBuffer(payload))
 	req.Header.Set("Content-Type", "application/json")
 	if errPost != nil {
-         log.Println("Unable to create post request:", errPost)
+         log.Errorf(ctx, "Unable to create post request: %s", errPost)
          return
     }
 
 	// Execute request
 	_, errSend := client.Do(req)
     if errSend != nil {
-         log.Println("Unable to reach the server:", errSend)
+         log.Errorf(ctx, "Unable to reach the server: %s", errSend)
          return
     }
 }
