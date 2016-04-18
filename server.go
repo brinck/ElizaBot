@@ -2,6 +2,7 @@ package elizabot
 
 import (
     "fmt"
+    "log"
     "net/http"
     "encoding/json"
 )
@@ -32,29 +33,29 @@ type Webhook struct {
 }
 
 type Entry struct {
-    id string,
-    time int,
+    id string
+    time int
     messaging []Messaging
 }
 
-type Messaging {
-	sender Sender,
-	recipient Recipient,
-	timestamp int,
-	message Message;
+type Messaging struct {
+	sender Sender
+	recipient Recipient
+	timestamp int
+	message Message
 }
 
-type Sender {
+type Sender struct {
 	id string
 }
 
-type Recipient {
+type Recipient struct {
 	id string
 }
 
-type Message {
-	mid string,
-	seq int, 
+type Message struct {
+	mid string
+	seq int
 	text string
 }
 
@@ -66,21 +67,28 @@ type Message {
  * Handler that lets the messenger API interface
  * with the elizabot.
  */
-func eliza(wr http.ResponseWriter, req *http.Request) 
-{
+func eliza(wr http.ResponseWriter, req *http.Request) {
 	// parse the request in json format
-	var data Webhook;
-	err := json.Unmarshal(req.Body, &data);
+	var data Webhook
+	dec := json.NewDecoder(req.Body)
+	err := dec.Decode(&data);
 	
 	if err != nil {
+		log.Println(err)
+		return
+	} 
+	
+	// loop through messages
+	messagingEvents := data.entry[0].messaging;
+	for i := 0; i < len(messagingEvents); i++ {
+		
+		// get message, sender and message text
+		event := messagingEvents[i]
+		//sender := event.sender.id
+		if event.message != (Message{}) && event.message.text != "" {
 
-	} else {
-		// loop through messages
-		messagingEvents := data.entry[0].messaging;
-		for i := 0; i < len(messagingEvents); i++ {
-			event := messagingEvents[i]
-			sender := event.sender.id
-			if event.message
+			// eliza goes here
+			//input := event.message.text
 		}
-	}	
+	}
 }
