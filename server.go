@@ -16,11 +16,16 @@ import (
  * bindings
  */
 func init() {
-    http.HandleFunc("/", handler)
-    http.HandleFunc("/webhook/", eliza)
+    http.HandleFunc("/", homeHandler)
+    http.HandleFunc("/webhook/", webhookHandler)
 }
 
-func handler(wr http.ResponseWriter, req *http.Request) {
+/*
+ * homeHandler(wr http.ResponseWriter, req *http.Request)
+ *
+ * Renders the page at "/"
+ */
+func homeHandler(wr http.ResponseWriter, req *http.Request) {
     fmt.Fprint(wr, goeliza.ElizaHi())
 }
 
@@ -58,24 +63,20 @@ type Message struct {
 	text string
 }
 
-
-
 /*
- * eliza(w http.ResponseWriter, r *http.Request) 
+ * webhookHandler(wr http.ResponseWriter, req *http.Request) 
  *
- * Handler that lets the messenger API interface
- * with the elizabot.
+ * Handler that lets the FB Messenger API interface
+ * with the elizabot at "/webhook" using POST messages
  */
-func eliza(wr http.ResponseWriter, req *http.Request) {
-
-	// verify facebook validation token
+func webhookHandler(wr http.ResponseWriter, req *http.Request) {
+	// Verify Facebook validation token
 	token := req.URL.Query().Get("hub.verify_token")
 	if (token == "quanfucius") {
 		fmt.Fprint(wr, req.URL.Query().Get("hub.challenge"))
 	}
 
-
-	// parse the request in json format
+	// Parse the request in JSON format
 	var data Webhook
 	dec := json.NewDecoder(req.Body)
 	err := dec.Decode(&data);
@@ -85,15 +86,12 @@ func eliza(wr http.ResponseWriter, req *http.Request) {
 		return
 	} 
 	
-	// loop through messages
+	// Loop through messages
 	messagingEvents := data.entry[0].messaging;
-	for i := 0; i < len(messagingEvents); i++ {
-		
-		// get message, sender and message text
-		event := messagingEvents[i]
-		if event.message != (Message{}) && event.message.text != "" {
+    for _, event := range messagingEvents {
+        if event.message != (Message{}) && event.message.text != "" {
             // Get reply to input message from goeliza
-			input := event.message.text
+            input := event.message.text
             output := goeliza.ReplyTo(input)
 
             // Construct Recipient and Message structs
@@ -101,6 +99,6 @@ func eliza(wr http.ResponseWriter, req *http.Request) {
             message := Message{"", 0, output}
 
             // Reply here
-		}
-	}
+        }
+    }
 }
