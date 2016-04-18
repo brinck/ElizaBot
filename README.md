@@ -1,6 +1,6 @@
 # ElizaBot
 
-ElizaBot is a Facebook Messenger chatbot that simulates a Rogerian psychotherapist. The chatbot server is written in Go and runs on Google App Engine.
+ElizaBot is a Facebook Messenger bot that simulates a Rogerian psychotherapist. The chatbot server is written in Go and runs on Google App Engine.
 
 Based on Weizenbaum's 1966 [ELIZA chatbot](https://en.wikipedia.org/wiki/ELIZA), and uses the [goeliza package](https://github.com/kennysong/goeliza).
 
