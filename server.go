@@ -20,8 +20,8 @@ func init() {
     http.HandleFunc("/webhook/", eliza)
 }
 
-func handler(w http.ResponseWriter, r *http.Request) {
-    fmt.Fprint(w, goeliza.ElizaHi())
+func handler(wr http.ResponseWriter, req *http.Request) {
+    fmt.Fprint(wr, goeliza.ElizaHi())
 }
 
 /*
@@ -67,6 +67,14 @@ type Message struct {
  * with the elizabot.
  */
 func eliza(wr http.ResponseWriter, req *http.Request) {
+
+	// verify facebook validation token
+	token := req.URL.Query().Get("hub.verify_token")
+	if (token == "quanfucius") {
+		fmt.Fprint(wr, req.URL.Query().Get("hub.challenge"))
+	}
+
+
 	// parse the request in json format
 	var data Webhook
 	dec := json.NewDecoder(req.Body)
