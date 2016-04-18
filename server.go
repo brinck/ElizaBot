@@ -5,6 +5,7 @@ import (
     "log"
     "net/http"
     "encoding/json"
+    "github.com/kennysong/goeliza"
 )
 
 /* 
@@ -20,10 +21,8 @@ func init() {
 }
 
 func handler(w http.ResponseWriter, r *http.Request) {
-    fmt.Fprint(w, "Hello, world!")
+    fmt.Fprint(w, goeliza.ElizaHi())
 }
-
-
 
 /*
  * JSON webhook structs
