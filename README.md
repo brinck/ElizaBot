@@ -9,6 +9,7 @@ Based on Weizenbaum's 1966 [ELIZA chatbot](https://en.wikipedia.org/wiki/ELIZA),
 To install dependencies:
 ```
 go get github.com/kennysong/goeliza
+go get google.golang.org/appengine
 ```
 
 To run the webapp on the local GAE development server:

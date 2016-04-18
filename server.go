@@ -1,12 +1,14 @@
 package elizabot
 
 import (
-    "fmt"
-    "log"
     "bytes"
-    "net/http"
     "encoding/json"
+    "fmt"
     "github.com/kennysong/goeliza"
+    "google.golang.org/appengine"
+    "google.golang.org/appengine/urlfetch"
+    "log"
+    "net/http"
 )
 
 
@@ -113,7 +115,7 @@ func webhookHandler(wr http.ResponseWriter, req *http.Request) {
             message := Message{"", 0, output}
 
             // Reply to user
-            webhookReply(recipient, message)
+            webhookReply(recipient, message, req)
         }
     }
 }
@@ -124,9 +126,10 @@ func webhookHandler(wr http.ResponseWriter, req *http.Request) {
  *
  * Function for replying to facebook.
  */
-func webhookReply(recipient Recipient, message Message) {
-	// Define client and url
-	client := http.Client{}
+func webhookReply(recipient Recipient, message Message, req *http.Request) {
+    // Create a GAE Context and urlfetch client for this request
+    ctx := appengine.NewContext(req)
+    client := urlfetch.Client(ctx)
 	url := "https://graph.facebook.com/v2.6/me/messages?access_token=" + SecretToken
 
 	// Prepare payload, and encode
