@@ -3,10 +3,13 @@ package elizabot
 import (
     "fmt"
     "log"
+    "bytes"
     "net/http"
     "encoding/json"
     "github.com/kennysong/goeliza"
 )
+
+
 
 /* 
  * init()
@@ -20,6 +23,8 @@ func init() {
     http.HandleFunc("/webhook/", webhookHandler)
 }
 
+
+
 /*
  * homeHandler(wr http.ResponseWriter, req *http.Request)
  *
@@ -29,8 +34,11 @@ func homeHandler(wr http.ResponseWriter, req *http.Request) {
     fmt.Fprint(wr, goeliza.ElizaHi())
 }
 
+
+
 /*
- * JSON webhook structs
+ * JSON webhook structs that handle 
+ * the parsing of the JSON data
  */
 type Webhook struct {
     entry []Entry
@@ -62,6 +70,13 @@ type Message struct {
 	seq int
 	text string
 }
+
+type Reply struct {
+	recipient Recipient
+	message Message
+}
+
+
 
 /*
  * webhookHandler(wr http.ResponseWriter, req *http.Request) 
@@ -98,7 +113,46 @@ func webhookHandler(wr http.ResponseWriter, req *http.Request) {
             recipient := Recipient{event.sender.id}
             message := Message{"", 0, output}
 
-            // Reply here
+            // Reply to user
+            webhookReply(recipient, message)
         }
+    }
+}
+
+
+/*
+ * reply(wr http.ResponseWriter)
+ *
+ * Function for replying to facebook.
+ */
+func webhookReply(recipient Recipient, message Message) {
+
+	// Define client and url
+	client := http.Client{}
+	url := "https://graph.facebook.com/v2.6/me/messages?access_token=" + SecretToken
+
+	// Prepare payload, and encode
+	// the payload correctly
+	reply := Reply{recipient: recipient, message: message}
+	payload, errMarshal := json.Marshal(reply)
+	if errMarshal != nil {
+		log.Println("Unable to serialise JSON message ", errMarshal)
+		return
+	}
+
+	// Create stream, set header and
+	// create request object
+	req, errPost := http.NewRequest("POST", url, bytes.NewBuffer(payload))
+	req.Header.Set("Content-Type", "application/javascript")
+	if errPost != nil {
+         log.Println("Unable to create post request, ", errPost)
+         return
+    }
+
+	// Execute request
+	_, errSend := client.Do(req)
+    if errSend != nil {
+         log.Println("Unable to reach the server, ", errSend)
+         return
     }
 }
