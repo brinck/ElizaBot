@@ -43,24 +43,24 @@ func homeHandler(wr http.ResponseWriter, req *http.Request) {
  * the parsing of the JSON data
  */
 type Webhook struct {
-    Entry []Entry
+    Entry []Entry `json:"entry"`
 }
 
 type Entry struct {
-    Id string
-    Time int
-    Messaging []Messaging
+    Id int64 `json:"id"`
+    Time int64 `json:"time"`
+    Messaging []Messaging `json:"messaging"`
 }
 
 type Messaging struct {
-	Sender Sender
-	Recipient Recipient
-	Timestamp int
-	Message Message
+	Sender Sender `json:"sender"`
+	Recipient Recipient `json:"recipient"`
+	Timestamp int64 `json:"timestamp"`
+	Message Message `json:"message"`
 }
 
 type Sender struct {
-	Id string
+	Id int64 `json:"id"`
 }
 
 type Reply struct {
@@ -69,12 +69,12 @@ type Reply struct {
 }
 
 type Recipient struct {
-    Id string `json:"id"`
+    Id int64 `json:"id"`
 }
 
 type Message struct {
     Mid string `json:"mid,omitempty"` 
-    Seq int `json:"seq,omitempty"`
+    Seq int64 `json:"seq,omitempty"`
     Text string `json:"text"`
 }
 
