@@ -41,39 +41,39 @@ func homeHandler(wr http.ResponseWriter, req *http.Request) {
  * the parsing of the JSON data
  */
 type Webhook struct {
-    entry []Entry
+    Entry []Entry
 }
 
 type Entry struct {
-    id string
-    time int
-    messaging []Messaging
+    Id string
+    Time int
+    Messaging []Messaging
 }
 
 type Messaging struct {
-	sender Sender
-	recipient Recipient
-	timestamp int
-	message Message
+	Sender Sender
+	Recipient Recipient
+	Timestamp int
+	Message Message
 }
 
 type Sender struct {
-	id string
+	Id string
 }
 
 type Recipient struct {
-	id string
+	Id string
 }
 
 type Message struct {
-	mid string
-	seq int
-	text string
+	Mid string
+	Seq int
+	Text string
 }
 
 type Reply struct {
-	recipient Recipient
-	message Message
+	Recipient Recipient
+	Message Message
 }
 
 
@@ -92,25 +92,24 @@ func webhookHandler(wr http.ResponseWriter, req *http.Request) {
 	}
 
 	// Parse the request in JSON format
-	var data Webhook
-	dec := json.NewDecoder(req.Body)
-	err := dec.Decode(&data);
-	
-	if err != nil {
-		log.Println(err)
-		return
-	} 
-	
+	var webhookData Webhook
+	decoder := json.NewDecoder(req.Body)
+	if err := decoder.Decode(&webhookData); err != nil {
+        log.Println("JSON decoding error:", err, req.Body)
+    }
+
 	// Loop through messages
-	messagingEvents := data.entry[0].messaging;
+	messagingEvents := webhookData.Entry[0].Messaging;
     for _, event := range messagingEvents {
-        if event.message != (Message{}) && event.message.text != "" {
+        if event.Message != (Message{}) && event.Message.Text != "" {
             // Get reply to input message from goeliza
-            input := event.message.text
+            input := event.Message.Text
             output := goeliza.ReplyTo(input)
 
+            log.Println("Input:", input, "Output:", output)
+
             // Construct Recipient and Message structs
-            recipient := Recipient{event.sender.id}
+            recipient := Recipient{event.Sender.Id}
             message := Message{"", 0, output}
 
             // Reply to user
@@ -121,38 +120,37 @@ func webhookHandler(wr http.ResponseWriter, req *http.Request) {
 
 
 /*
- * reply(wr http.ResponseWriter)
+ * webhookReply(recipient Recipient, message Message)
  *
  * Function for replying to facebook.
  */
 func webhookReply(recipient Recipient, message Message) {
-
 	// Define client and url
 	client := http.Client{}
 	url := "https://graph.facebook.com/v2.6/me/messages?access_token=" + SecretToken
 
 	// Prepare payload, and encode
 	// the payload correctly
-	reply := Reply{recipient: recipient, message: message}
+	reply := Reply{recipient, message}
 	payload, errMarshal := json.Marshal(reply)
 	if errMarshal != nil {
-		log.Println("Unable to serialise JSON message ", errMarshal)
+		log.Println("Serializing JSON error:", errMarshal)
 		return
 	}
 
 	// Create stream, set header and
 	// create request object
 	req, errPost := http.NewRequest("POST", url, bytes.NewBuffer(payload))
-	req.Header.Set("Content-Type", "application/javascript")
+	req.Header.Set("Content-Type", "application/json")
 	if errPost != nil {
-         log.Println("Unable to create post request, ", errPost)
+         log.Println("Unable to create post request:", errPost)
          return
     }
 
 	// Execute request
 	_, errSend := client.Do(req)
     if errSend != nil {
-         log.Println("Unable to reach the server, ", errSend)
+         log.Println("Unable to reach the server:", errSend)
          return
     }
 }
