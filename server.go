@@ -63,21 +63,20 @@ type Sender struct {
 	Id string
 }
 
+type Reply struct {
+	Recipient Recipient `json:"recipient"`
+	Message Message `json:"message"`
+}
+
 type Recipient struct {
-	Id string
+    Id string `json:"id"`
 }
 
 type Message struct {
-	Mid string
-	Seq int
-	Text string
+    Mid string `json:"mid,omitempty"` 
+    Seq int `json:"seq,omitempty"`
+    Text string `json:"text"`
 }
-
-type Reply struct {
-	Recipient Recipient
-	Message Message
-}
-
 
 
 /*
@@ -143,6 +142,7 @@ func webhookReply(recipient Recipient, message Message, req *http.Request) {
 		log.Errorf(ctx, "Serializing JSON error: %s", errMarshal)
 		return
 	}
+    log.Debugf(ctx, "payload = %v", string(payload))
 
 	// Create stream, set header and
 	// create request object
