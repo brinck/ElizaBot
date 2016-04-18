@@ -91,11 +91,16 @@ func eliza(wr http.ResponseWriter, req *http.Request) {
 		
 		// get message, sender and message text
 		event := messagingEvents[i]
-		//sender := event.sender.id
 		if event.message != (Message{}) && event.message.text != "" {
+            // Get reply to input message from goeliza
+			input := event.message.text
+            output := goeliza.ReplyTo(input)
 
-			// eliza goes here
-			//input := event.message.text
+            // Construct Recipient and Message structs
+            recipient := Recipient{event.sender.id}
+            message := Message{"", 0, output}
+
+            // Reply here
 		}
 	}
 }
