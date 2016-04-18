@@ -27,15 +27,38 @@ func handler(w http.ResponseWriter, r *http.Request) {
 /*
  * JSON webhook structs
  */
-type message struct {
-    entries[] Entry
+type Webhook struct {
+    entry []Entry
 }
 
 type Entry struct {
     id string,
     time int,
-    messages[]
+    messaging []Messaging
 }
+
+type Messaging {
+	sender Sender,
+	recipient Recipient,
+	timestamp int,
+	message Message;
+}
+
+type Sender {
+	id string
+}
+
+type Recipient {
+	id string
+}
+
+type Message {
+	mid string,
+	seq int, 
+	text string
+}
+
+
 
 /*
  * eliza(w http.ResponseWriter, r *http.Request) 
@@ -45,10 +68,19 @@ type Entry struct {
  */
 func eliza(wr http.ResponseWriter, req *http.Request) 
 {
-	// parse the request json format, see stack overflow for reference
-	// http://stackoverflow.com/questions/15672556/handling-json-post-request-in-go
-	decoder := json.NewDecoder(req.Body);
+	// parse the request in json format
+	var data Webhook;
+	err := json.Unmarshal(req.Body, &data);
 	
-	messagingEvents := req.Body.entry[0].messaging;
-	for i := 0; i < messagingEvents
+	if err != nil {
+
+	} else {
+		// loop through messages
+		messagingEvents := data.entry[0].messaging;
+		for i := 0; i < len(messagingEvents); i++ {
+			event := messagingEvents[i]
+			sender := event.sender.id
+			if event.message
+		}
+	}	
 }
