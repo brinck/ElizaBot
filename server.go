@@ -12,6 +12,13 @@ import (
 )
 
 
+// TODO
+// set global variable that holds information
+// on the senders that are communicating
+// with Eliza, and the last time they communicated
+// TODO
+// set a timeout constant
+
 
 /* 
  * init()
@@ -110,6 +117,19 @@ func webhookHandler(wr http.ResponseWriter, req *http.Request) {
             input := event.Message.Text
             output := goeliza.ReplyTo(input)
 
+            // TODO 
+            // get sender id and store it in 
+            // the global variable along with a time stamp 
+            // TODO
+            // if this is the first time the sender is 
+            // communicating with Eliza, send a hello message
+            // TODO 
+            // loop over sender objects and check for any
+            // senders that have been idle for more than
+            // the time out varialbe. If so, send them a
+            // "goodbye" message and delete them from
+            // the object
+
             log.Debugf(ctx, "Input: %s\nOutput: %s", input, output)
 
             // Construct Recipient and Message structs
@@ -137,25 +157,23 @@ func webhookReply(recipient Recipient, message Message, req *http.Request) {
 	// Prepare payload, and encode
 	// the payload correctly
 	reply := Reply{recipient, message}
-	payload, errMarshal := json.Marshal(reply)
-	if errMarshal != nil {
+	payload, errMarshal := json.Marshal(reply); if errMarshal != nil {
 		log.Errorf(ctx, "Serializing JSON error: %s", errMarshal)
 		return
 	}
+	
     log.Debugf(ctx, "payload = %v", string(payload))
 
 	// Create stream, set header and
 	// create request object
-	req, errPost := http.NewRequest("POST", url, bytes.NewBuffer(payload))
-	req.Header.Set("Content-Type", "application/json")
-	if errPost != nil {
+	req, errPost := http.NewRequest("POST", url, bytes.NewBuffer(payload)); if errPost != nil {
          log.Errorf(ctx, "Unable to create post request: %s", errPost)
          return
     }
-
+	req.Header.Set("Content-Type", "application/json")
+	
 	// Execute request
-	_, errSend := client.Do(req)
-    if errSend != nil {
+	_, errSend := client.Do(req); if errSend != nil {
          log.Errorf(ctx, "Unable to reach the server: %s", errSend)
          return
     }
