@@ -9,6 +9,7 @@ Based on Weizenbaum's 1966 [ELIZA chatbot](https://en.wikipedia.org/wiki/ELIZA),
 To install dependencies:
 ```
 go get github.com/kennysong/goeliza
+go get github.com/urakozz/go-emoji
 go get google.golang.org/appengine
 ```
 
