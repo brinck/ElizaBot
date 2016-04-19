@@ -19,72 +19,25 @@ import (
 // TODO
 // set a timeout constant
 
-
 /* 
  * init()
  *
- * Supposedly this function is run by the google containers
- * rather than the main() function to setup the server 
- * bindings
+ * Supposedly this function is run by the google containers rather than the 
+ * main() function to setup the server bindings
  */
 func init() {
     http.HandleFunc("/", homeHandler)
     http.HandleFunc("/webhook/", webhookHandler)
 }
 
-
-
 /*
  * homeHandler(wr http.ResponseWriter, req *http.Request)
  *
- * Renders the page at "/"
+ * Handler that renders the page at "/"
  */
 func homeHandler(wr http.ResponseWriter, req *http.Request) {
     fmt.Fprint(wr, goeliza.ElizaHi())
 }
-
-
-
-/*
- * JSON webhook structs that handle 
- * the parsing of the JSON data
- */
-type Webhook struct {
-    Entry []Entry `json:"entry"`
-}
-
-type Entry struct {
-    Id int64 `json:"id"`
-    Time int64 `json:"time"`
-    Messaging []Messaging `json:"messaging"`
-}
-
-type Messaging struct {
-    Sender Sender `json:"sender"`
-    Recipient Recipient `json:"recipient"`
-    Timestamp int64 `json:"timestamp"`
-    Message Message `json:"message"`
-}
-
-type Sender struct {
-    Id int64 `json:"id"`
-}
-
-type Reply struct {
-    Recipient Recipient `json:"recipient"`
-    Message Message `json:"message"`
-}
-
-type Recipient struct {
-    Id int64 `json:"id"`
-}
-
-type Message struct {
-    Mid string `json:"mid,omitempty"` 
-    Seq int64 `json:"seq,omitempty"`
-    Text string `json:"text"`
-}
-
 
 /*
  * webhookHandler(wr http.ResponseWriter, req *http.Request) 
@@ -126,7 +79,7 @@ func webhookHandler(wr http.ResponseWriter, req *http.Request) {
             // TODO 
             // loop over sender objects and check for any
             // senders that have been idle for more than
-            // the time out varialbe. If so, send them a
+            // the time out variable. If so, send them a
             // "goodbye" message and delete them from
             // the object
 
@@ -141,7 +94,6 @@ func webhookHandler(wr http.ResponseWriter, req *http.Request) {
         }
     }
 }
-
 
 /*
  * webhookReply(recipient Recipient, message Message)
