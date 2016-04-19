@@ -6,10 +6,12 @@ import (
     "fmt"
     "html/template"
     "github.com/kennysong/goeliza"
+    "github.com/urakozz/go-emoji"
     "google.golang.org/appengine"
     "google.golang.org/appengine/log"
     "google.golang.org/appengine/urlfetch"
     "net/http"
+    "strings"
 )
 
 
@@ -36,9 +38,15 @@ func init() {
  * homeHandler(wr http.ResponseWriter, req *http.Request)
  *
  * Handler that renders the page at "/"
+ * TODO: Message Us button doesn't seem to be working
  */
 func homeHandler(wr http.ResponseWriter, req *http.Request) {
-    fmt.Fprint(wr, goeliza.ElizaHi())
+    ctx := appengine.NewContext(req)
+    tpl := template.Must(template.ParseGlob("templates/*.html"))
+    wr.Header().Set("Content-Type", "text/html; charset=utf-8")
+    if err := tpl.ExecuteTemplate(wr, "index.html", nil); err != nil {
+        log.Errorf(ctx, "%v", err)
+    }
 }
 
 /*
@@ -82,8 +90,14 @@ func webhookHandler(wr http.ResponseWriter, req *http.Request) {
     messagingEvents := webhookData.Entry[0].Messaging;
     for _, event := range messagingEvents {
         if event.Message != (Message{}) && event.Message.Text != "" {
-            // Get reply to input message from goeliza
-            input := event.Message.Text
+            // Preprocess and validate input message from goeliza
+            input := preprocess(event.Message.Text)
+            if notValidInput(input) {
+                log.Errorf(ctx, "Not valid input: %v", event.Message.Text)
+                return
+            }
+
+            // Get reply from ELIZA
             output := goeliza.ReplyTo(input)
 
             // TODO 
@@ -99,7 +113,7 @@ func webhookHandler(wr http.ResponseWriter, req *http.Request) {
             // "goodbye" message and delete them from
             // the object
 
-            log.Debugf(ctx, "Input: %s\nOutput: %s", input, output)
+            log.Debugf(ctx, "Input: \"%s\"\nOutput: \"%s\"", input, output)
 
             // Construct Recipient and Message structs
             recipient := Recipient{event.Sender.Id}
@@ -109,6 +123,33 @@ func webhookHandler(wr http.ResponseWriter, req *http.Request) {
             webhookReply(recipient, message, req)
         }
     }
+}
+
+/*
+ * preprocess(statement string) string
+ *
+ * Preprocesses a string for ELIZA
+ */
+func preprocess(statement string) string {
+    // Remove all emoji
+    parser := emoji.NewEmojiParser()
+    statement = parser.ReplaceAllStringFunc(statement, func(s string) string {
+        return ""
+    })
+
+    // Trim whitespace
+    statement = strings.TrimSpace(statement)
+    
+    return statement
+}
+
+/*
+ * notValidInput(statement string) bool
+ *
+ * Checks if the statement is a valid input for Eliza (not empty)
+ */
+func notValidInput(statement string) bool {
+    return strings.TrimSpace(statement) == ""
 }
 
 /*
