@@ -4,6 +4,7 @@ import (
     "bytes"
     "encoding/json"
     "fmt"
+    "html/template"
     "github.com/kennysong/goeliza"
     "google.golang.org/appengine"
     "google.golang.org/appengine/log"
@@ -28,6 +29,7 @@ import (
 func init() {
     http.HandleFunc("/", homeHandler)
     http.HandleFunc("/webhook/", webhookHandler)
+    http.HandleFunc("/privacy/", privacyHandler)
 }
 
 /*
@@ -40,10 +42,24 @@ func homeHandler(wr http.ResponseWriter, req *http.Request) {
 }
 
 /*
+ * privacyHandler(wr http.ResponseWriter, req *http.Request)
+ *
+ * Handler that renders the Privacy Policy at "/privacy/"
+ */
+func privacyHandler(wr http.ResponseWriter, req *http.Request) {
+    ctx := appengine.NewContext(req)
+    tpl := template.Must(template.ParseGlob("templates/*.html"))
+    wr.Header().Set("Content-Type", "text/html; charset=utf-8")
+    if err := tpl.ExecuteTemplate(wr, "privacy.html", nil); err != nil {
+        log.Errorf(ctx, "%v", err)
+    }
+}
+
+/*
  * webhookHandler(wr http.ResponseWriter, req *http.Request) 
  *
  * Handler that lets the FB Messenger API interface
- * with the elizabot at "/webhook" using POST messages
+ * with the elizabot at "/webhook/" using POST messages
  */
 func webhookHandler(wr http.ResponseWriter, req *http.Request) {
     // Create a GAE Context for this request
