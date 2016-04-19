@@ -60,19 +60,19 @@ type Entry struct {
 }
 
 type Messaging struct {
-	Sender Sender `json:"sender"`
-	Recipient Recipient `json:"recipient"`
-	Timestamp int64 `json:"timestamp"`
-	Message Message `json:"message"`
+    Sender Sender `json:"sender"`
+    Recipient Recipient `json:"recipient"`
+    Timestamp int64 `json:"timestamp"`
+    Message Message `json:"message"`
 }
 
 type Sender struct {
-	Id int64 `json:"id"`
+    Id int64 `json:"id"`
 }
 
 type Reply struct {
-	Recipient Recipient `json:"recipient"`
-	Message Message `json:"message"`
+    Recipient Recipient `json:"recipient"`
+    Message Message `json:"message"`
 }
 
 type Recipient struct {
@@ -96,21 +96,21 @@ func webhookHandler(wr http.ResponseWriter, req *http.Request) {
     // Create a GAE Context for this request
     ctx := appengine.NewContext(req)
 
-	// Verify Facebook validation token
-	token := req.URL.Query().Get("hub.verify_token")
-	if (token == "quanfucius") {
-		fmt.Fprint(wr, req.URL.Query().Get("hub.challenge"))
-	}
+    // Verify Facebook validation token
+    token := req.URL.Query().Get("hub.verify_token")
+    if (token == "quanfucius") {
+        fmt.Fprint(wr, req.URL.Query().Get("hub.challenge"))
+    }
 
-	// Parse the request in JSON format
-	var webhookData Webhook
-	decoder := json.NewDecoder(req.Body)
-	if err := decoder.Decode(&webhookData); err != nil {
+    // Parse the request in JSON format
+    var webhookData Webhook
+    decoder := json.NewDecoder(req.Body)
+    if err := decoder.Decode(&webhookData); err != nil {
         log.Errorf(ctx, "JSON decoding error:\nerr: %v\nreq.Body: %v", err, req.Body)
     }
 
-	// Loop through messages
-	messagingEvents := webhookData.Entry[0].Messaging;
+    // Loop through messages
+    messagingEvents := webhookData.Entry[0].Messaging;
     for _, event := range messagingEvents {
         if event.Message != (Message{}) && event.Message.Text != "" {
             // Get reply to input message from goeliza
@@ -152,28 +152,28 @@ func webhookReply(recipient Recipient, message Message, req *http.Request) {
     // Create a GAE Context and urlfetch client for this request
     ctx := appengine.NewContext(req)
     client := urlfetch.Client(ctx)
-	url := "https://graph.facebook.com/v2.6/me/messages?access_token=" + SecretToken
+    url := "https://graph.facebook.com/v2.6/me/messages?access_token=" + SecretToken
 
-	// Prepare payload, and encode
-	// the payload correctly
-	reply := Reply{recipient, message}
-	payload, errMarshal := json.Marshal(reply); if errMarshal != nil {
-		log.Errorf(ctx, "Serializing JSON error: %s", errMarshal)
-		return
-	}
-	
+    // Prepare payload, and encode
+    // the payload correctly
+    reply := Reply{recipient, message}
+    payload, errMarshal := json.Marshal(reply); if errMarshal != nil {
+        log.Errorf(ctx, "Serializing JSON error: %s", errMarshal)
+        return
+    }
+    
     log.Debugf(ctx, "payload = %v", string(payload))
 
-	// Create stream, set header and
-	// create request object
-	req, errPost := http.NewRequest("POST", url, bytes.NewBuffer(payload)); if errPost != nil {
+    // Create stream, set header and
+    // create request object
+    req, errPost := http.NewRequest("POST", url, bytes.NewBuffer(payload)); if errPost != nil {
          log.Errorf(ctx, "Unable to create post request: %s", errPost)
          return
     }
-	req.Header.Set("Content-Type", "application/json")
-	
-	// Execute request
-	_, errSend := client.Do(req); if errSend != nil {
+    req.Header.Set("Content-Type", "application/json")
+    
+    // Execute request
+    _, errSend := client.Do(req); if errSend != nil {
          log.Errorf(ctx, "Unable to reach the server: %s", errSend)
          return
     }
