@@ -2,25 +2,106 @@
 <html>
 <head>
   <title>ElizaBot</title>
+  <meta name="viewport" content="width=device-width">
+
+  <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,300' rel='stylesheet' type='text/css'>
+  <style>
+    html, body {
+      font-family: "Open Sans", sans-serif;
+      height: 100%;
+      background: #2980b9; /* fallback for old browsers */
+      background: -webkit-linear-gradient(to left, #2980b9 , #2c3e50); /* Chrome 10-25, Safari 5.1-6 */
+      background: linear-gradient(to left, #2980b9 , #2c3e50); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+    }
+
+    #card {
+      text-align: center;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      font-size: 16px;
+      width: 350px;
+      height: 300px;
+      margin: -170px -195px 0;
+      background: white;
+      border-radius: 6px;
+      padding: 20px 20px;
+    }
+
+    h1 {
+      font-size: 40px;
+      font-weight: 300;
+      color: rgb(175, 175, 175);
+      margin-top: 30px;
+    }
+
+    h1 .eliza {
+      font-weight: 400;
+      color: black;
+    }
+
+    p {
+      font-weight: 300;
+      margin: 30px 0px 30px;
+    }
+
+    .button {
+      display: block; 
+      text-align: left; 
+      margin: auto;
+      width: 155px;
+    }
+
+    .button a {
+      width: 155px;
+      border-radius: 6px;
+      border: 1px solid #d5d5d5;
+      padding: 6px 6px 6px 0;
+      text-decoration: none;
+      text-shadow: none;
+      margin: 0;
+      display: inline-block;
+      color: #575757;
+      line-height: 24px;
+      font-size: 14px;
+      color: white;
+    }
+
+    .button a.messenger {
+      background: url('/static/img/messenger.png') no-repeat 5px 6px;
+      background-color: #56b4ff !important;
+      border-color: #3691da;
+      background-size: 23px 23px;
+      margin-bottom: 5px;
+    }
+
+    .button a.github {
+      background: url('/static/img/github.png') no-repeat 5px 6px;
+      background-color: rgb(111, 111, 111) !important;
+      border-color: rgb(51, 51, 51);
+      background-size: 23px 23px;
+    }
+
+    @media (max-width: 400px) {
+      #card {
+        width: 300px;
+        padding: 10px 10px;
+        font-size: 14px;
+        margin-left: -160px;
+      }
+    }
+  </style>
 </head>
 <body>
-  <script>
-    window.fbAsyncInit = function() {
-      FB.init({
-        appId      : '212250085822433',
-        xfbml      : true,
-        version    : 'v2.6'
-      });
-    };
-
-    (function(d, s, id){
-       var js, fjs = d.getElementsByTagName(s)[0];
-       if (d.getElementById(id)) { return; }
-       js = d.createElement(s); js.id = id;
-       js.src = "//connect.facebook.net/en_US/sdk.js";
-       fjs.parentNode.insertBefore(js, fjs);
-    }(document, 'script', 'facebook-jssdk'));
-  </script>
-  <div class="fb-messengermessageus" messenger_app_id="212250085822433" page_id="ElizaBot-233459570376580" color="blue" size="large"></div>
+  <div id="card">
+    <h1><span class="eliza">Eliza</span>Bot</h1>  
+    <p>ElizaBot is a Facebook Messenger bot that simulates a Rogerian psychotherapist.</p>
+    <div class="button">
+      <a class="messenger" target="_blank" href="http://m.me/ElizaBot-233459570376580/">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Message ElizaBot</a>
+    </div>
+    <div class="button">
+      <a class="github" target="_blank" href="https://github.com/brinck/ElizaBot">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Source on Github</a>
+    </div>
+  </div>
 </body>
 </html>
